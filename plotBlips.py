@@ -5,6 +5,9 @@ import sys
 import dataFunctions
 import math
 
+ROOT.gSystem.Setenv("TZ","America/Chicago")
+ROOT.gStyle.SetTimeOffset(0);
+
 # Analysis variables
 bQuickMode = 1 # Batch mode
 # Drawing variables

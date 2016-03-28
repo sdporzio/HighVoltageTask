@@ -2,9 +2,12 @@ import ROOT
 import array
 import math
 import pytz
+from pytz import timezone
 from datetime import datetime as dt
 
-ILtz = pytz.timezone("America/Chicago")
+CST = timezone("US/Central")
+GMT = timezone("Europe/London")
+EUR = timezone("Europe/Rome")
 nullSensitivity = 0.005 # Where to find the "feet" of the peak (0 finds them on the 0 axis)
 
 # Get string with date
@@ -12,9 +15,9 @@ def GetDateString(iTime):
     # year = ROOT.TDatime(int(iTime)).GetYear()
     # month = datetime.date(1900, ROOT.TDatime(int(iTime)).GetMonth(),1).strftime('%B')
     # day = ROOT.TDatime(int(iTime)).GetDay()
-    naive = dt.fromtimestamp(iTime)
+    naive = dt.utcfromtimestamp(iTime)
     aware = pytz.UTC.localize(naive)
-    local = aware.astimezone(ILtz).strftime('%d %B %y')
+    local = aware.astimezone(CST).strftime('%d %B %y')
     return local
 
 
@@ -24,9 +27,9 @@ def GetTimeString(iTime):
     # minute = ROOT.TDatime(int(iTime)).GetMinute()
     # second = ROOT.TDatime(int(iTime)).GetSecond()
     # sTime = "%i:%i:%i" %(hour,minute,second)
-    naive = dt.fromtimestamp(iTime)
+    naive = dt.utcfromtimestamp(iTime)
     aware = pytz.UTC.localize(naive)
-    local = aware.astimezone(ILtz).strftime('%H:%M:%S')
+    local = aware.astimezone(CST).strftime('%H:%M:%S')
     return local
 
 
