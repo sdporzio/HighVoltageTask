@@ -5,6 +5,9 @@ import sys
 import dataFunctions
 import math
 
+ROOT.gSystem.Setenv("TZ","America/Chicago")
+ROOT.gStyle.SetTimeOffset(0);
+
 # Analysis variables
 bQuickMode = 1 # Batch mode
 # Drawing variables
@@ -60,6 +63,7 @@ for i in range(len(timePMT)-1):
     maxX = timePMT[i]+dataPerCanvas
     minY = dispPV-0.2
     maxY = dispCM+0.1
+    gDT.GetXaxis().SetTimeDisplay(1)
     gDT.GetXaxis().SetRangeUser(minX,maxX)
     gDT.GetYaxis().SetRangeUser(minY,maxY)
 

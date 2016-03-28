@@ -51,6 +51,7 @@ for i in range(len(timeHV)-1):
     maxX = timeHV[i]+dataPerCanvas
     minY = dispPV-0.2
     maxY = dispCM+0.1
+    gDT.GetXaxis().SetTimeDisplay(1)
     gDT.GetXaxis().SetRangeUser(minX,maxX)
     gDT.GetYaxis().SetRangeUser(minY,maxY)
 
