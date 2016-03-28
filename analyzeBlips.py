@@ -152,11 +152,11 @@ c5.cd(2)
 hBlipDurationDist.Draw("EH")
 
 
-c1.SaveAs("Plot_Blips/c1.png")
-c2.SaveAs("Plot_Blips/c2.png")
-c3.SaveAs("Plot_Blips/c3.png")
-c4.SaveAs("Plot_Blips/c4.png")
-c5.SaveAs("Plot_Blips/c5.png")
+c1.SaveAs("Plots_Blips/c1.png")
+c2.SaveAs("Plots_Blips/c2.png")
+c3.SaveAs("Plots_Blips/c3.png")
+c4.SaveAs("Plots_Blips/c4.png")
+c5.SaveAs("Plots_Blips/c5.png")
 
 if not bQuickMode:
     print "Waiting for input"

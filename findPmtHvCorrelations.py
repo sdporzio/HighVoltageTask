@@ -3,12 +3,14 @@ import array
 from dataFunctions import GetDateString as GDS
 from dataFunctions import GetTimeString as GTS
 
-coincidenceTime = 5 # in seconds
-outName = "Timestamps/coincidencesHvPmt_"+str(coincidenceTime)+"s.dat"
+coincidenceTime = 30 # in seconds
+outName1 = "Timestamps/coincidencesHvPmt_"+str(coincidenceTime)+"s.dat"
+outName2 = "Timestamps/WithOrigin/originFile_CoincidencesHvPmt_"+str(coincidenceTime)+"s.dat"
 
 fHV = open("Timestamps/hvBlips.dat")
 fPMT = open("Timestamps/pmtHits.dat")
-fOut = open(outName,"w")
+fOut1 = open(outName1,"w")
+fOut2 = open(outName2,"w")
 fHV.readline()
 fPMT.readline()
 
@@ -29,4 +31,5 @@ for i,timestampHV in enumerate(timeHV):
     for j,timestampPMT in enumerate(timePMT):
         deltaT = abs(timestampHV-timestampPMT)
         if deltaT < coincidenceTime:
-            fOut.write(originFilePMT[j]+" "+str(timestampPMT)+"\n")
+            fOut1.write(str(timestampPMT)+"\n")
+            fOut2.write(originFilePMT[j]+" "+str(timestampPMT)+"\n")
