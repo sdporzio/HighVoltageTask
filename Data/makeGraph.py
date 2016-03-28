@@ -2,8 +2,11 @@ import ROOT
 import array
 import datetime
 import sys
-import dataFunctions
 import math
+
+sys.path.insert(0, '/home/sdporzio/HighVoltageTask')
+import dataFunctions
+
 
 # Analysis variables
 bQuickMode = 1 # Batch mode
@@ -17,10 +20,9 @@ dispCM = 0.2 # CM data "displacement" from zero (for drawing)
 ROOT.gROOT.SetBatch(bQuickMode)
 
 # Read files
-dirPath = "/uboone/data/users/sporzio/HighVoltageTask/ExtendedData/"
-fDT = open(dirPath+"DifferenceTracker.dat")
-fPV = open(dirPath+"PickOffVoltage.dat")
-fCM = open(dirPath+"CurrMon.dat")
+fDT = open("DifferenceTracker.dat")
+fPV = open("PickOffVoltage.dat")
+fCM = open("CurrMon.dat")
 fRoot = ROOT.TFile("DT_PV_CM.root","RECREATE")
 fDT.readline()
 fPV.readline()
@@ -54,13 +56,13 @@ gCM = ROOT.TGraph(len(timeCM)-1,timeCM,valCM)
 gDT.SetName("gDT")
 gPV.SetName("gPV")
 gCM.SetName("gCM")
-gDT.GetXaxis().SetTimeDisplay(1)
+# gDT.GetXaxis().SetTimeDisplay(1)
 gDT.SetMarkerColor(2)
 gDT.SetMarkerStyle(7)
-gPV.GetXaxis().SetTimeDisplay(1)
+# gPV.GetXaxis().SetTimeDisplay(1)
 gPV.SetMarkerColor(3)
 gPV.SetMarkerStyle(7)
-gCM.GetXaxis().SetTimeDisplay(1)
+# gCM.GetXaxis().SetTimeDisplay(1)
 gCM.SetMarkerColor(29)
 gCM.SetMarkerStyle(7)
 

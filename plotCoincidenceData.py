@@ -20,7 +20,7 @@ ROOT.gROOT.SetBatch(bQuickMode)
 if len(sys.argv) > 1:
     timeList = sys.argv[1]
 else:
-    sys.exit("ERROR: No input file provided")
+    timeList = "Timestamps/coincidencesHvPmt_30s.dat"
 
 # Read files
 rootFile = "Data/DT_PV_CM.root"
@@ -31,29 +31,62 @@ gCM = fRoot.gCM
 
 fTS = open(timeList)
 fTS.readline()
-timeTS = array.array("d",[])
+pathTS = []
+timePMT = array.array("d",[])
+timeHV = array.array("d",[])
+typeTS = []
+intensityTS = array.array("d",[])
+durationTS = array.array("d",[])
+deltaTS = array.array("d",[])
+
 for line in fTS:
-    timeTS.append(float(line))
+    x = line.split()
+    pathTS.append(x[0])
+    timePMT.append(float(x[1]))
+    timeHV.append(float(x[2]))
+    typeTS.append(x[3])
+    intensityTS.append(float(x[4]))
+    durationTS.append(float(x[5]))
+    deltaTS.append(float(x[6]))
 
 # Create graph and canvas
 c1 = ROOT.TCanvas()
 
 # Find entry corresponding to timestamp
-for i in range(0,len(timeTS)-1):
+for i in range(len(timePMT)-1):
 
     # Set axis
-    minX = timeTS[i]-dataPerCanvas
-    maxX = timeTS[i]+dataPerCanvas
+    minX = timePMT[i]-dataPerCanvas
+    maxX = timePMT[i]+dataPerCanvas
     minY = dispPV-0.2
     maxY = dispCM+0.1
     gDT.GetXaxis().SetRangeUser(minX,maxX)
     gDT.GetYaxis().SetRangeUser(minY,maxY)
 
     # Set title
-    eTime = dataFunctions.GetTimeString(timeTS[i])
-    eDate = dataFunctions.GetDateString(timeTS[i])
+    eTime = dataFunctions.GetTimeString(timePMT[i])
+    eDate = dataFunctions.GetDateString(timePMT[i])
     gTitle = "%s [%s]" %(eDate,eTime)
     gDT.SetTitle(gTitle)
+
+    # Set lines
+    lPMT = ROOT.TLine(timePMT[i],minY,timePMT[i],maxY)
+    lPMT.SetLineWidth(3)
+    lPMT.SetLineColor(2)
+    lHV = ROOT.TLine(timeHV[i],minY,timeHV[i],maxY)
+    lHV.SetLineWidth(3)
+    lHV.SetLineColor(2)
+
+    # Set paveText
+    paveText = ROOT.TPaveText(0.6,0.7,0.95,0.92,"NDC")
+    ptType = "Blip type: %s" %(typeTS[i])
+    ptIntensity = "Intensity: %.2f V" %(intensityTS[i])
+    ptDuration = "Duration: %.2f s" %(durationTS[i])
+    ptDelta = "DeltaTime(PMT - HV): %.2f" %(deltaTS[i])
+    paveText.AddText(ptType)
+    paveText.AddText(ptIntensity)
+    paveText.AddText(ptDuration)
+    paveText.AddText(ptDelta)
 
     # Legend
     leg = ROOT.TLegend(0.6,0.11,0.89,0.25)
@@ -68,4 +101,7 @@ for i in range(0,len(timeTS)-1):
     gDT.Draw("SAMEP")
     gPV.Draw("SAMEP")
     leg.Draw()
-    c1.SaveAs("Plots_FromList/plot_"+str(timeTS[i])+".png")
+    lPMT.Draw()
+    lHV.Draw()
+    paveText.Draw()
+    c1.SaveAs("Plots_FromList/plot_"+str(timePMT[i])+".png")

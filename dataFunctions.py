@@ -1,27 +1,33 @@
 import ROOT
 import array
-import datetime
 import math
+import pytz
+from datetime import datetime as dt
 
+ILtz = pytz.timezone("America/Chicago")
 nullSensitivity = 0.005 # Where to find the "feet" of the peak (0 finds them on the 0 axis)
-
 
 # Get string with date
 def GetDateString(iTime):
-    year = ROOT.TDatime(int(iTime)).GetYear()
-    month = datetime.date(1900, ROOT.TDatime(int(iTime)).GetMonth(),1).strftime('%B')
-    day = ROOT.TDatime(int(iTime)).GetDay()
-    sDate = "%i %s %i" %(day,month,year)
-    return sDate
+    # year = ROOT.TDatime(int(iTime)).GetYear()
+    # month = datetime.date(1900, ROOT.TDatime(int(iTime)).GetMonth(),1).strftime('%B')
+    # day = ROOT.TDatime(int(iTime)).GetDay()
+    naive = dt.fromtimestamp(iTime)
+    aware = pytz.UTC.localize(naive)
+    local = aware.astimezone(ILtz).strftime('%d %B %y')
+    return local
 
 
 # Get string with time
 def GetTimeString(iTime):
-    hour = ROOT.TDatime(int(iTime)).GetHour()
-    minute = ROOT.TDatime(int(iTime)).GetMinute()
-    second = ROOT.TDatime(int(iTime)).GetSecond()
-    sTime = "%i:%i:%i" %(hour,minute,second)
-    return sTime
+    # hour = ROOT.TDatime(int(iTime)).GetHour()
+    # minute = ROOT.TDatime(int(iTime)).GetMinute()
+    # second = ROOT.TDatime(int(iTime)).GetSecond()
+    # sTime = "%i:%i:%i" %(hour,minute,second)
+    naive = dt.fromtimestamp(iTime)
+    aware = pytz.UTC.localize(naive)
+    local = aware.astimezone(ILtz).strftime('%H:%M:%S')
+    return local
 
 
 # Determine if datapoint signal an interesting event
