@@ -4,11 +4,11 @@ from dataFunctions import GetDateString as GDS
 from dataFunctions import GetTimeString as GTS
 
 coincidenceTime = 5 # in seconds
-outName = "Timestamps/coincidencesHvPmt"+str(coincidenceTime)+"s.dat"
+outName = "Timestamps/coincidencesHvPmt_"+str(coincidenceTime)+"s.dat"
 
 fHV = open("Timestamps/hvBlips.dat")
 fPMT = open("Timestamps/pmtHits.dat")
-outFile = open(outName,"w")
+fOut = open(outName,"w")
 fHV.readline()
 fPMT.readline()
 
@@ -29,4 +29,4 @@ for i,timestampHV in enumerate(timeHV):
     for j,timestampPMT in enumerate(timePMT):
         deltaT = abs(timestampHV-timestampPMT)
         if deltaT < coincidenceTime:
-            print originFilePMT[j], timestampPMT
+            fOut.write(originFilePMT[j]+" "+str(timestampPMT)+"\n")
