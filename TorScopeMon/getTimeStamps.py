@@ -3,23 +3,30 @@
 import os
 import ROOT
 
-dirPath = "/uboone/app/users/sporzio/HighVoltageTask/TorScopeMonAna/GAHS/RootFiles/"
-homePath = "/uboone/app/users/sporzio/HighVoltageTask/"
+# Script variables
+yLimit = 10
 
-outPath = homePath+"Timestamps/pmtHits.dat"
 
+# Path to input and output
+rootDir = "/uboone/app/users/sporzio/HighVoltageTask/TorScopeMonAna/GAHS/RootFiles/"
+outPath = "/uboone/app/users/sporzio/HighVoltageTask/Timestamps/pmtHits.dat"
+
+# Script is writing over existing file, so delete it first if it belongs
+# to previous run
 if os.path.exists(outPath):
     print "Removing previous", outPath
     os.remove(outPath)
-for filename in os.listdir(dirPath):
-    fRoot = ROOT.TFile(dirPath+filename,"READ")
+
+# Loop through each file in rootDir
+for filename in os.listdir(rootDir):
+    fRoot = ROOT.TFile(rootDir+filename,"READ")
     fOut = open(outPath,"a")
 
+    # Open TTree
     tree = fRoot.torscope_tree
-
     for eventNumber in range(tree.GetEntries()):
         tree.GetEntry(eventNumber)
-        originFile = dirPath + filename
+        originFile = rootDir + filename
         firstTS = str(tree.unixtime[0])
         fOut.write(originFile+" "+firstTS + "\n")
         # for timestamp in tree.unixtime:

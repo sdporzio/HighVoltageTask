@@ -11,7 +11,7 @@ ROOT.gStyle.SetTimeOffset(0);
 # Analysis variables
 bQuickMode = 1 # Batch mode
 # Drawing variables
-dataPerCanvas = 200 # How many extra seconds to draw (left and right)
+dataPerCanvas = 600 # How many extra seconds to draw (left and right)
 avePV = -216.75 # PV average baseline
 aveCM = 6.3 # CM average baseline
 multCM = 10 # Factor by which to "compress" CM data
@@ -76,10 +76,10 @@ for i in range(len(timePMT)-1):
     # Set lines
     lPMT = ROOT.TLine(timePMT[i],minY,timePMT[i],maxY)
     lPMT.SetLineWidth(3)
-    lPMT.SetLineColor(2)
+    lPMT.SetLineColor(4)
     lHV = ROOT.TLine(timeHV[i],minY,timeHV[i],maxY)
     lHV.SetLineWidth(3)
-    lHV.SetLineColor(2)
+    lHV.SetLineColor(1)
 
     # Set paveText
     paveText = ROOT.TPaveText(0.6,0.7,0.95,0.92,"NDC")
