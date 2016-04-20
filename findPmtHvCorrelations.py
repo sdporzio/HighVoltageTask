@@ -2,17 +2,19 @@ import ROOT
 import array
 from dataFunctions import GetDateString as GDS
 from dataFunctions import GetTimeString as GTS
-
+ROOT.gROOT.SetBatch(1)
+histo = ROOT.TH1D("histo","Coincidences vs. minY cut",25,-200,50)
 
 coincidenceTime = 30 # in seconds
-for cutY in range(-210,-100, 10):
-    outName = "Timestamps/coincidencesHvPmt_"+str(coincidenceTime)+"s_Cut"+str(cutY)+".dat"
+
+for cutY in range(-210,50,10):
+    outName = "Timestamps/Coincidences/coincidencesHvPmt_"+str(coincidenceTime)+"s_Cut"+str(cutY)+".dat"
 
     fHV = open("Timestamps/hvBlips.dat")
     fPMT = open("TorScopeMon/Timestamps/pmtHits_cutMinY"+str(cutY)+".dat")
     fOut = open(outName,"w")
-    fHV.readline()
-    fPMT.readline()
+    lHV = fHV.readlines()
+    lPMT = fPMT.readlines()
 
     timeHV = array.array("d",[])
     blipType = []
@@ -21,14 +23,15 @@ for cutY in range(-210,-100, 10):
     originFilePMT = []
     timePMT = array.array("d",[])
 
-    for line in fHV:
+    i = 0
+    for line in lHV:
         x = line.split()
         timeHV.append(float(x[0]))
         blipType.append(x[1])
         blipIntensity.append(float(x[5]))
         blipDuration.append(float(x[6]))
 
-    for line in fPMT:
+    for line in lPMT:
         x = line.split()
         originFilePMT.append(x[0])
         timePMT.append(float(x[1]))
@@ -41,3 +44,8 @@ for cutY in range(-210,-100, 10):
                 str(timestampHV)+" "+blipType[i]+" "+str(blipIntensity[i])+" "+ \
                 str(blipDuration[i])+" "+str(deltaT)+"\n"
                 fOut.write(outString)
+                histo.Fill(cutY)
+
+c1 = ROOT.TCanvas()
+histo.Draw()
+c1.SaveAs("Plots_Others/coincVsCut.png")

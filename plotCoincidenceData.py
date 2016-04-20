@@ -20,92 +20,94 @@ dispCM = 0.2 # CM data "displacement" from zero (for drawing)
 ROOT.gROOT.SetBatch(bQuickMode)
 
 # Check input file
-if len(sys.argv) > 1:
-    timeList = sys.argv[1]
-else:
-    timeList = "Timestamps/coincidencesHvPmt_30s.dat"
+# if len(sys.argv) > 1:
+#     timeList = sys.argv[1]
+# else:
+#     timeList = "Timestamps/Coincidences/coincidencesHvPmt_30s_Cut-150.dat"
 
-# Read files
-rootFile = "Data/DT_PV_CM.root"
-fRoot = ROOT.TFile(rootFile,"READ")
-gDT = fRoot.gDT
-gPV = fRoot.gPV
-gCM = fRoot.gCM
+for cutY in range(-210,50,10):
+    # Read files
+    rootFile = "Data/DT_PV_CM.root"
+    timeList = "Timestamps/Coincidences/coincidencesHvPmt_30s_Cut"+str(cutY)+".dat"
+    fRoot = ROOT.TFile(rootFile,"READ")
+    gDT = fRoot.gDT
+    gPV = fRoot.gPV
+    gCM = fRoot.gCM
 
-fTS = open(timeList)
-fTS.readline()
-pathTS = []
-timePMT = array.array("d",[])
-timeHV = array.array("d",[])
-typeTS = []
-intensityTS = array.array("d",[])
-durationTS = array.array("d",[])
-deltaTS = array.array("d",[])
+    fTS = open(timeList)
+    lTS = fTS.readlines()
+    pathTS = []
+    timePMT = array.array("d",[])
+    timeHV = array.array("d",[])
+    typeTS = []
+    intensityTS = array.array("d",[])
+    durationTS = array.array("d",[])
+    deltaTS = array.array("d",[])
 
-for line in fTS:
-    x = line.split()
-    pathTS.append(x[0])
-    timePMT.append(float(x[1]))
-    timeHV.append(float(x[2]))
-    typeTS.append(x[3])
-    intensityTS.append(float(x[4]))
-    durationTS.append(float(x[5]))
-    deltaTS.append(float(x[6]))
+    for line in lTS:
+        print line
+        x = line.split()
+        pathTS.append(x[0])
+        timePMT.append(float(x[1]))
+        timeHV.append(float(x[2]))
+        typeTS.append(x[3])
+        intensityTS.append(float(x[4]))
+        durationTS.append(float(x[5]))
+        deltaTS.append(float(x[6]))
 
-# Create graph and canvas
-c1 = ROOT.TCanvas()
+    # Create graph and canvas
+    c1 = ROOT.TCanvas()
 
-# Find entry corresponding to timestamp
-for i in range(len(timePMT)-1):
+    # Find entry corresponding to timestamp
+    for i in range(len(timePMT)):
+        # Set axis
+        minX = timePMT[i]-dataPerCanvas
+        maxX = timePMT[i]+dataPerCanvas
+        minY = dispPV-0.2
+        maxY = dispCM+0.1
+        gDT.GetXaxis().SetTimeDisplay(1)
+        gDT.GetXaxis().SetRangeUser(minX,maxX)
+        gDT.GetYaxis().SetRangeUser(minY,maxY)
 
-    # Set axis
-    minX = timePMT[i]-dataPerCanvas
-    maxX = timePMT[i]+dataPerCanvas
-    minY = dispPV-0.2
-    maxY = dispCM+0.1
-    gDT.GetXaxis().SetTimeDisplay(1)
-    gDT.GetXaxis().SetRangeUser(minX,maxX)
-    gDT.GetYaxis().SetRangeUser(minY,maxY)
+        # Set title
+        eTime = dataFunctions.GetTimeString(timePMT[i])
+        eDate = dataFunctions.GetDateString(timePMT[i])
+        gTitle = "%s [%s]" %(eDate,eTime)
+        gDT.SetTitle(gTitle)
 
-    # Set title
-    eTime = dataFunctions.GetTimeString(timePMT[i])
-    eDate = dataFunctions.GetDateString(timePMT[i])
-    gTitle = "%s [%s]" %(eDate,eTime)
-    gDT.SetTitle(gTitle)
+        # Set lines
+        lPMT = ROOT.TLine(timePMT[i],minY,timePMT[i],maxY)
+        lPMT.SetLineWidth(3)
+        lPMT.SetLineColor(4)
+        lHV = ROOT.TLine(timeHV[i],minY,timeHV[i],maxY)
+        lHV.SetLineWidth(3)
+        lHV.SetLineColor(1)
 
-    # Set lines
-    lPMT = ROOT.TLine(timePMT[i],minY,timePMT[i],maxY)
-    lPMT.SetLineWidth(3)
-    lPMT.SetLineColor(4)
-    lHV = ROOT.TLine(timeHV[i],minY,timeHV[i],maxY)
-    lHV.SetLineWidth(3)
-    lHV.SetLineColor(1)
+        # Set paveText
+        paveText = ROOT.TPaveText(0.6,0.7,0.95,0.92,"NDC")
+        ptType = "Blip type: %s" %(typeTS[i])
+        ptIntensity = "Intensity: %.2f V" %(intensityTS[i])
+        ptDuration = "Duration: %.2f s" %(durationTS[i])
+        ptDelta = "DeltaTime(PMT - HV): %.2f" %(deltaTS[i])
+        paveText.AddText(ptType)
+        paveText.AddText(ptIntensity)
+        paveText.AddText(ptDuration)
+        paveText.AddText(ptDelta)
 
-    # Set paveText
-    paveText = ROOT.TPaveText(0.6,0.7,0.95,0.92,"NDC")
-    ptType = "Blip type: %s" %(typeTS[i])
-    ptIntensity = "Intensity: %.2f V" %(intensityTS[i])
-    ptDuration = "Duration: %.2f s" %(durationTS[i])
-    ptDelta = "DeltaTime(PMT - HV): %.2f" %(deltaTS[i])
-    paveText.AddText(ptType)
-    paveText.AddText(ptIntensity)
-    paveText.AddText(ptDuration)
-    paveText.AddText(ptDelta)
+        # Legend
+        leg = ROOT.TLegend(0.6,0.11,0.89,0.25)
+        leg.AddEntry(gDT, "Deviation Tracker", "p")
+        leg.AddEntry(gPV, "PickOff Voltage", "p")
+        leg.AddEntry(gCM, "Current Monitor", "p")
+        leg.SetFillStyle(0)
+        leg.SetBorderSize(0)
 
-    # Legend
-    leg = ROOT.TLegend(0.6,0.11,0.89,0.25)
-    leg.AddEntry(gDT, "Deviation Tracker", "p")
-    leg.AddEntry(gPV, "PickOff Voltage", "p")
-    leg.AddEntry(gCM, "Current Monitor", "p")
-    leg.SetFillStyle(0)
-    leg.SetBorderSize(0)
-
-    gDT.Draw("AP")
-    gCM.Draw("SAMEP")
-    gDT.Draw("SAMEP")
-    gPV.Draw("SAMEP")
-    leg.Draw()
-    lPMT.Draw()
-    lHV.Draw()
-    paveText.Draw()
-    c1.SaveAs("Plots_FromList/plot_"+str(timePMT[i])+".png")
+        gDT.Draw("AP")
+        gCM.Draw("SAMEP")
+        gDT.Draw("SAMEP")
+        gPV.Draw("SAMEP")
+        leg.Draw()
+        lPMT.Draw()
+        lHV.Draw()
+        paveText.Draw()
+        c1.SaveAs("Plots_Coincidences/plot_Cut"+str(cutY)+"_"+str(timePMT[i])+".png")

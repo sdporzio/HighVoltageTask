@@ -235,7 +235,7 @@ Plot("OutVariables/histo4.png")
 
 
 # In[8]:
-for i in range(-210,-100, 10):
+for i in range(-210,50, 10):
     cuty = i
     outName = "Timestamps/pmtHits_cutMinY%i.dat" %(cuty)
     fOut = open(outName,"w")
