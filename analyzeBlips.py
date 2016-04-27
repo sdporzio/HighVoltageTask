@@ -54,16 +54,28 @@ for i in range(0,t):
     if duration[i] < durMin:
         durMin = duration[i]
 
-hAllTime = ROOT.TH2D("hAllTime","Type of events vs. Time",int(nDays/daysPerBin),startTime,endTime,3,0,3)
-hAllHour = ROOT.TH2D("hAllHour","Type of events vs. Hour",24,0,24,3,0,3)
-hAllDayWeek = ROOT.TH2D("hAllDayWeek","Type of events vs. Day of the week",7,1,8,3,0,3)
-hBlipNumber = ROOT.TH1D("hBlipNumber","Blip - Events vs. Time",int(nDays/daysPerBin),startTime,endTime)
-#hBlipHeight = ROOT.TH2D("hBlipHeight","Blip - Height (over baseline) vs. time",nDays,startTime,endTime,10,peakMin,peakMax)
-#hBlipDuration = ROOT.TH2D("hBlipDuration","Blip - Duration vs. time",nDays,startTime,endTime,10,durMin,durMax)
-hBlipHeight = ROOT.TH2D("hBlipHeight","Blip - Height (over baseline) vs. time",int(nDays/daysPerBin),startTime,endTime,10,0,0.7)
-hBlipDuration = ROOT.TH2D("hBlipDuration","Blip - Duration vs. time",int(nDays/daysPerBin),startTime,endTime,10,0,80)
-hBlipHeightDist = ROOT.TH1D("hBlipHeight","Blip - Height",10,0,0.7)
-hBlipDurationDist = ROOT.TH1D("hBlipDuration","Blip - Duration",10,0,80)
+# hAllTime = ROOT.TH2D("hAllTime","Type of events vs. Time",int(nDays/daysPerBin),startTime,endTime,3,0,3)
+# hAllHour = ROOT.TH2D("hAllHour","Type of events vs. Hour",24,0,24,3,0,3)
+# hAllDayWeek = ROOT.TH2D("hAllDayWeek","Type of events vs. Day of the week",7,1,8,3,0,3)
+# hBlipNumber = ROOT.TH1D("hBlipNumber","Blip - Events vs. Time",int(nDays/daysPerBin),startTime,endTime)
+# hBlipHeight = ROOT.TH2D("hBlipHeight","Blip - Height (over baseline) vs. time",int(nDays/daysPerBin),startTime,endTime,10,0,0.7)
+# hBlipDuration = ROOT.TH2D("hBlipDuration","Blip - Duration vs. time",int(nDays/daysPerBin),startTime,endTime,10,0,80)
+# hBlipHeightDist = ROOT.TH1D("hBlipHeight","Blip - Height",10,0,0.7)
+# hBlipDurationDist = ROOT.TH1D("hBlipDuration","Blip - Duration",10,0,80)
+hAllTime = ROOT.TH2D("hAllTime","",int(nDays/daysPerBin),startTime,endTime,3,0,3)
+hAllHour = ROOT.TH2D("hAllHour","",24,0,24,3,0,3)
+hAllDayWeek = ROOT.TH2D("hAllDayWeek","",7,1,8,3,0,3)
+hBlipNumber = ROOT.TH1D("hBlipNumber","",int(nDays/daysPerBin),startTime,endTime)
+hBlipHeight = ROOT.TH2D("hBlipHeight","",int(nDays/daysPerBin),startTime,endTime,10,0,0.7)
+hBlipDuration = ROOT.TH2D("hBlipDuration","",int(nDays/daysPerBin),startTime,endTime,10,0,80)
+hBlipHeightDist = ROOT.TH1D("hBlipHeight","",10,0,0.7)
+hBlipDurationDist = ROOT.TH1D("hBlipDuration","",10,0,80)
+
+
+
+
+
+
 
 timeDivisions = int(nWeeks/4) + 4*100
 hAllTime.GetXaxis().SetTimeDisplay(1)
@@ -123,10 +135,10 @@ for i in range(0,t):
     hBlipHeightDist.Fill(peakob[i])
     hBlipDurationDist.Fill(duration[i])
 
-c1 = ROOT.TCanvas("c1","c1",1366,768)
+c1 = ROOT.TCanvas("c1","c1",800,600)
 hAllTime.Draw("COLZ")
 hAllTime.Draw("SAME TEXT")
-c2 = ROOT.TCanvas("c2","c2",1366,768)
+c2 = ROOT.TCanvas("c2","c2",800,600)
 c2.Divide(1,2)
 c2.cd(1)
 hBlipHeight.Draw("COLZ")
@@ -134,7 +146,7 @@ hBlipHeight.Draw("SAME TEXT")
 c2.cd(2)
 hBlipDuration.Draw("COLZ")
 hBlipDuration.Draw("SAME TEXT")
-c3 = ROOT.TCanvas("c3","c3",1366,768)
+c3 = ROOT.TCanvas("c3","c3",800,600)
 c3.Divide(1,2)
 c3.cd(1)
 hAllHour.Draw("COLZ")
@@ -142,9 +154,9 @@ hAllHour.Draw("SAME TEXT")
 c3.cd(2)
 hAllDayWeek.Draw("COLZ")
 hAllDayWeek.Draw("SAME TEXT")
-c4 = ROOT.TCanvas("c4","c4",1366,768)
+c4 = ROOT.TCanvas("c4","c4",800,600)
 hBlipNumber.Draw("EH")
-c5 = ROOT.TCanvas("c5","c5",1366,768)
+c5 = ROOT.TCanvas("c5","c5",800,600)
 c5.Divide(1,2)
 c5.cd(1)
 hBlipHeightDist.Draw("EH")
@@ -152,11 +164,11 @@ c5.cd(2)
 hBlipDurationDist.Draw("EH")
 
 
-c1.SaveAs("Plots_Blips/c1.png")
-c2.SaveAs("Plots_Blips/c2.png")
-c3.SaveAs("Plots_Blips/c3.png")
-c4.SaveAs("Plots_Blips/c4.png")
-c5.SaveAs("Plots_Blips/c5.png")
+c1.SaveAs("Plots_Blips/c1.pdf")
+c2.SaveAs("Plots_Blips/c2.pdf")
+c3.SaveAs("Plots_Blips/c3.pdf")
+c4.SaveAs("Plots_Blips/c4.pdf")
+c5.SaveAs("Plots_Blips/c5.pdf")
 
 if not bQuickMode:
     print "Waiting for input"

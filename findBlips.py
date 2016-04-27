@@ -5,6 +5,9 @@ import sys
 import dataFunctions
 import math
 
+ROOT.gSystem.Setenv("TZ","America/Chicago")
+ROOT.gStyle.SetTimeOffset(0);
+
 # Analysis variables
 bNoLimit = 1 # Analyze portion of data (0) of all data (1)
 bQuickMode = 1 # Batch mode
@@ -344,7 +347,7 @@ while iDT < len(timeDT)-1:
         leg.Draw()
 
 
-        c1.SaveAs("Plots_Blips/blip_"+str(int(timeDT[peakPointer]))+".png")
+        c1.SaveAs("Plots_Blips/blip_"+str(int(timeDT[peakPointer]))+".pdf")
         outputline = "%i %s %s %s %s %f %f \n" %(timeDT[peakPointer],DTblipType,PVblipType,shortBaselineStatus,longBaselineStatus,peakob,fwhm)
         print outputline
         fBL.write(outputline)
