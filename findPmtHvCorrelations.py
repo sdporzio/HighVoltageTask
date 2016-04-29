@@ -1,7 +1,9 @@
 import ROOT
 import array
-from dataFunctions import GetDateString as GDS
-from dataFunctions import GetTimeString as GTS
+import sys
+sys.path.insert(0, '/Users/sdporzio/HighVoltageTask')
+from HvPackages.dataFunctions import GetDateString as GDS
+from HvPackages.dataFunctions import GetTimeString as GTS
 ROOT.gROOT.SetBatch(1)
 histo = ROOT.TH1D("histo","Coincidences vs. minY cut",25,-200,50)
 
