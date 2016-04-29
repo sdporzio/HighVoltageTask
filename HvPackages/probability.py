@@ -23,7 +23,7 @@ def prob2(nMonths,tWindow,nHV,nPMT):
     return prob
 
 
-def prob3(nMonths,tWindow,nHV,nPMT):
+def prob3(nMonths,tWindow,nHV,nPMT,nCoinc):
     tTotal = 60*60*24*30*nMonths # seconds
     nBins = tTotal/tWindow
     pGen = 1./float(nBins)
@@ -31,7 +31,6 @@ def prob3(nMonths,tWindow,nHV,nPMT):
     rateHV = float(nHV)/float(tTotal)
     ratePMT = float(nPMT)/float(tTotal)
     coincidenceRate = rateHV * (1 - math.exp(-1 * ratePMT*tWindow))
-    nCoinc = 1
 
     average = coincidenceRate * tTotal
     prob = float(pow(average,nCoinc) * math.exp(-1*average))/float(math.factorial(nCoinc))
