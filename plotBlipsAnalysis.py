@@ -2,6 +2,7 @@ import ROOT
 import array
 import datetime
 import sys
+sys.path.insert(0, '/Users/sdporzio/HighVoltageTask')
 fermilabOffset = -6*60*60
 ROOT.gStyle.SetTimeOffset(fermilabOffset);
 ROOT.gStyle.SetPalette(ROOT.kRainBow);

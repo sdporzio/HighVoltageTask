@@ -1,9 +1,10 @@
 import ROOT
 import array
 import datetime
-import sys
-import dataFunctions
 import math
+import sys
+sys.path.insert(0, '/Users/sdporzio/HighVoltageTask')
+import HvPackages.dataFunctions as dataFunctions
 
 ROOT.gSystem.Setenv("TZ","America/Chicago")
 ROOT.gStyle.SetTimeOffset(0);
