@@ -53,3 +53,8 @@ def average3(nMonths,tWindow,nHV,nPMT):
     average = coincidenceRate * tTotal
 
     return average
+
+def poissonian(average):
+    prob = pow(average,int(average)) * math.exp(-1*average)/float(math.factorial(int(average)))
+    
+    return prob
