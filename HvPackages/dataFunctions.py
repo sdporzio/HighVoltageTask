@@ -2,6 +2,7 @@ import ROOT
 import array
 import math
 import pytz
+import time
 from pytz import timezone
 from datetime import datetime as dt
 
@@ -31,6 +32,12 @@ def GetTimeString(iTime):
     aware = pytz.UTC.localize(naive)
     local = aware.astimezone(CST).strftime('%H:%M:%S')
     return local
+
+def GetChicagoTimestamp(year,month,day,hour,minute,second):
+    naive = dt(year,month,day,hour,minute,second)
+    aware = CST.localize(naive).astimezone(pytz.utc)
+    unixtime = time.mktime(aware.timetuple())
+    return unixtime
 
 
 # Determine if datapoint signal an interesting event
