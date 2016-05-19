@@ -9,6 +9,17 @@ import HvPackages.dataFunctions as dataFunctions
 ROOT.gSystem.Setenv("TZ","America/Chicago")
 ROOT.gStyle.SetTimeOffset(0);
 
+def CathodeDown(timestamp):
+    if timestamp > 1450006200 and timestamp < 1450041600:
+        return True
+    if timestamp > 1454418000 and timestamp < 1454551200:
+        return True
+    if timestamp > 1456927200 and timestamp < 1456981200:
+        return True
+    if timestamp > 1459976400 and timestamp < 1460088000:
+        return True
+    return False
+
 # Analysis variables
 bNoLimit = 1 # Analyze portion of data (0) of all data (1)
 bQuickMode = 1 # Batch mode
@@ -35,10 +46,10 @@ endData = 500000 # Stop after "endData" points
 dataPerCanvas = 200 # Beside the peak, how many extra datapoints to draw to the left and to the right
 
 # Read files
-fDT = open("Data/DifferenceTracker.dat")
-fPV = open("Data/PickOffVoltage.dat")
-fCM = open("Data/CurrMon.dat")
-fBL = open("Plots_Blips/hvBlips.dat","w")
+fDT = open("Data_SlowMonCon/differenceTracker.dat")
+fPV = open("Data_SlowMonCon/pickOffVoltage.dat")
+fCM = open("Data_SlowMonCon/currMon.dat")
+fBL = open("Data_Events/hvEvents.dat","w")
 fDT.readline()
 fPV.readline()
 fCM.readline()
@@ -104,6 +115,12 @@ PVpointL = 0
 PVpointR = 0
 PVpointC = 0
 while iDT < len(timeDT)-1:
+    # if cathode is down go to next datapoint
+    if CathodeDown(timeDT[iDT]):
+        print "CathodeDown!"
+        iDT += 1
+        continue
+
     # Default analysis variable values
     bInteresting = False
     blipSign = 0 # Whether peak is positive (+1) or negative (-1)
@@ -348,7 +365,7 @@ while iDT < len(timeDT)-1:
         leg.Draw()
 
 
-        c1.SaveAs("Plots_Blips/blip_"+str(int(timeDT[peakPointer]))+".pdf")
+        c1.SaveAs("Plots/Blips/blip_"+str(int(timeDT[peakPointer]))+".pdf")
         outputline = "%i %s %s %s %s %f %f \n" %(timeDT[peakPointer],DTblipType,PVblipType,shortBaselineStatus,longBaselineStatus,peakob,fwhm)
         print outputline
         fBL.write(outputline)
