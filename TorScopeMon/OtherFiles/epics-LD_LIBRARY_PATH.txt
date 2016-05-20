@@ -1,0 +1,1 @@
+/uboonenew/epics/v3_14_12_ub/lib/linux-x86_64:/uboone/netsnmp/v5_7_2/Linux64bit+2.6-2.12-GCC_4_7_1/lib

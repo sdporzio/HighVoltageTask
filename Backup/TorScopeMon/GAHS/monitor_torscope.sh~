@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source /home/uboonesmc/setup_SMC_EPICS.sh
+setup root v5_34_25a =q e7:prof
+export PYTHONPATH=$PYTHONPATH:/home/uboonesmc/pyepics-3.2.1/:

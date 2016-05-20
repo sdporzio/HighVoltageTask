@@ -1,0 +1,6 @@
+[?1034hTraceback (most recent call last):
+  File "mon_root.py", line 6, in <module>
+    import epics
+  File "/uboonenew/root/v5_34_25a/Linux64bit+2.6-2.12-e7-prof/lib/ROOT.py", line 353, in _importhook
+    return _orig_ihook( name, glbls, lcls, fromlist, level )
+ImportError: No module named epics

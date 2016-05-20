@@ -3,6 +3,7 @@ import array
 import datetime
 import math
 import sys
+import os
 sys.path.insert(0, '/Users/sdporzio/HighVoltageTask')
 import HvPackages.dataFunctions as dataFunctions
 
@@ -23,7 +24,7 @@ def CathodeDown(timestamp):
 # Analysis variables
 bNoLimit = 1 # Analyze portion of data (0) of all data (1)
 bQuickMode = 1 # Batch mode
-heightDev = 0.1 # How large a deviation from zero in the DT to start investigating the event
+heightDev = 0.06 # How large a deviation from zero in the DT to start investigating the event
 shortAveVal = 120 # Short average length (in seconds)
 longAveVal = 900 # Long average length (in seconds)
 allAveLR = 0.02 # Allowed average difference between left and right
@@ -49,7 +50,7 @@ dataPerCanvas = 200 # Beside the peak, how many extra datapoints to draw to the 
 fDT = open("Data_SlowMonCon/differenceTracker.dat")
 fPV = open("Data_SlowMonCon/pickOffVoltage.dat")
 fCM = open("Data_SlowMonCon/currMon.dat")
-fBL = open("Data_Events/hvEvents.dat","w")
+fBL = open("Data_Events/hvEvents_"+str(heightDev)+"V.dat","w")
 fDT.readline()
 fPV.readline()
 fCM.readline()
@@ -364,8 +365,10 @@ while iDT < len(timeDT)-1:
         paveText.Draw()
         leg.Draw()
 
-
-        c1.SaveAs("Plots/Blips/blip_"+str(int(timeDT[peakPointer]))+".pdf")
+        outPath = "Plots/Blips_"+str(heightDev)+"V/"
+        if not os.path.isdir(outPath):
+            os.makedirs(outPath)
+        c1.SaveAs(outPath+"blip_"+str(int(timeDT[peakPointer]))+".png")
         outputline = "%i %s %s %s %s %f %f \n" %(timeDT[peakPointer],DTblipType,PVblipType,shortBaselineStatus,longBaselineStatus,peakob,fwhm)
         print outputline
         fBL.write(outputline)
