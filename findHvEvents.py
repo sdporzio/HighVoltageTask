@@ -24,7 +24,7 @@ def CathodeDown(timestamp):
 # Analysis variables
 bNoLimit = 1 # Analyze portion of data (0) of all data (1)
 bQuickMode = 1 # Batch mode
-heightDev = 0.06 # How large a deviation from zero in the DT to start investigating the event
+heightDev = 0.1 # How large a deviation from zero in the DT to start investigating the event
 shortAveVal = 120 # Short average length (in seconds)
 longAveVal = 900 # Long average length (in seconds)
 allAveLR = 0.02 # Allowed average difference between left and right
@@ -54,6 +54,7 @@ fBL = open("Data_Events/hvEvents_"+str(heightDev)+"V.dat","w")
 fDT.readline()
 fPV.readline()
 fCM.readline()
+fBL.write('# Timestamp TypeDT TypePV ShortStatus LongStatus PeakRatio PeakOverBaseline FWHM\n')
 
 # Read data from files
 t = 0
@@ -137,6 +138,7 @@ while iDT < len(timeDT)-1:
         # Find DT key points
         DTpoint0,DTpointL1,DTpointC1,DTpointR1,DTpointL2zero,DTpointR2zero,DTpointL2,DTpointR2,DTpointC2 = dataFunctions.FindDTKeyPoints(blipSign,valDT,iDT)
         integral1,integral2,intRatio = dataFunctions.DetDTIntegral(valDT,timeDT,DTpointL1,DTpointR1,DTpointL2,DTpointR2)
+        peakRatio = abs(valDT[DTpointC1]/valDT[DTpointC2])
         peakPointer = DTpointC1
         iDT = DTpointR2 # New starting point for analysis will be end of previous interesting region
 
@@ -369,7 +371,7 @@ while iDT < len(timeDT)-1:
         if not os.path.isdir(outPath):
             os.makedirs(outPath)
         c1.SaveAs(outPath+"blip_"+str(int(timeDT[peakPointer]))+".png")
-        outputline = "%i %s %s %s %s %f %f \n" %(timeDT[peakPointer],DTblipType,PVblipType,shortBaselineStatus,longBaselineStatus,peakob,fwhm)
+        outputline = "%i %s %s %s %s %f %f %f\n" %(timeDT[peakPointer],DTblipType,PVblipType,shortBaselineStatus,longBaselineStatus,peakRatio,peakob,fwhm)
         print outputline
         fBL.write(outputline)
 
