@@ -1,7 +1,7 @@
 import ROOT
 import array
 import sys
-sys.path.insert(0, '/Users/sdporzio/HighVoltageTask')
+sys.path.insert(0, os.environ.get('PROJDIR_HVANA'))
 from HvPackages.dataFunctions import GetDateString as GDS
 from HvPackages.dataFunctions import GetTimeString as GTS
 ROOT.gROOT.SetBatch(1)

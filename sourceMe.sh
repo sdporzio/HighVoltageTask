@@ -1,0 +1,1 @@
+export PROJDIR_HVANA=${PWD}

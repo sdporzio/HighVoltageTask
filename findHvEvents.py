@@ -4,27 +4,29 @@ import datetime
 import math
 import sys
 import os
-sys.path.insert(0, '/Users/sdporzio/HighVoltageTask')
+import numpy as np
+from datetime import datetime as dt
+projDir = os.environ.get('PROJDIR_HVANA')
+sys.path.insert(0, projDir)
+import HvPackages.dtOperations as DTO
 import HvPackages.dataFunctions as dataFunctions
 
+str2DT = lambda x: DTO.GetChicagoTimestampDT(dt.strptime(x,'%Y-%m-%d %H:%M:%S'))
+catDown = np.genfromtxt(projDir+"/Extractor/cathodeDown.dat",delimiter="\t",names=True,dtype=None,converters={0:str2DT,1:str2DT})
+def cathodeDown(time):
+    for i in range(len(catDown)):
+        if catDown['Start'][i] <= time <= catDown['End'][i]:
+            return True
+    return False
+
+# THIS MUST GO AFTER ANY DTO FUNCTION! It's a global environment variable and it will mess with python scripts for datetime
 ROOT.gSystem.Setenv("TZ","America/Chicago")
 ROOT.gStyle.SetTimeOffset(0);
-
-def CathodeDown(timestamp):
-    if timestamp > 1450006200 and timestamp < 1450041600:
-        return True
-    if timestamp > 1454418000 and timestamp < 1454551200:
-        return True
-    if timestamp > 1456927200 and timestamp < 1456981200:
-        return True
-    if timestamp > 1459976400 and timestamp < 1460088000:
-        return True
-    return False
 
 # Analysis variables
 bNoLimit = 1 # Analyze portion of data (0) of all data (1)
 bQuickMode = 1 # Batch mode
-heightDev = 0.1 # How large a deviation from zero in the DT to start investigating the event
+heightDev = 0.06 # How large a deviation from zero in the DT to start investigating the event
 shortAveVal = 120 # Short average length (in seconds)
 longAveVal = 900 # Long average length (in seconds)
 allAveLR = 0.02 # Allowed average difference between left and right
@@ -47,9 +49,12 @@ endData = 500000 # Stop after "endData" points
 dataPerCanvas = 200 # Beside the peak, how many extra datapoints to draw to the left and to the right
 
 # Read files
-fDT = open("Data_SlowMonCon/differenceTracker.dat")
-fPV = open("Data_SlowMonCon/pickOffVoltage.dat")
-fCM = open("Data_SlowMonCon/currMon.dat")
+fDT = open("Data_SlowMonCon/uB_TPCDrift_HV01_keithleyPickOff_voltDiff5s60s_160101_160615.dat")
+fPV = open("Data_SlowMonCon/uB_TPCDrift_HV01_keithleyPickOff_getVoltage_160101_160615.dat")
+fCM = open("Data_SlowMonCon/uB_TPCDrift_HV01_keithleyCurrMon_calcCurrent_160101_160615.dat")
+# fDT = open("Data_SlowMonCon/differenceTracker.dat")
+# fPV = open("Data_SlowMonCon/pickOffVoltage.dat")
+# fCM = open("Data_SlowMonCon/currMon.dat")
 fBL = open("Data_Events/hvEvents_"+str(heightDev)+"V.dat","w")
 fDT.readline()
 fPV.readline()
@@ -66,6 +71,9 @@ valCM = array.array("d",[])
 timeCM = array.array("d",[])
 
 for line in fDT:
+    if line.startswith("#"):
+        print "found one!"
+        continue
     x = line.split()
     timeDT.append(float(x[0]))
     valDT.append(float(x[1]))
@@ -75,6 +83,9 @@ for line in fDT:
             break
 
 for line in fPV:
+    if line.startswith("#"):
+        print "found one!"
+        continue
     x = line.split()
     timePV.append(float(x[0]))
     valPV.append(float(x[1])-avePV+dispPV)
@@ -84,6 +95,9 @@ for line in fPV:
             break
 
 for line in fCM:
+    if line.startswith("#"):
+        print "found one!"
+        continue
     x = line.split()
     timeCM.append(float(x[0]))
     valCM.append((float(x[1])-aveCM)/multCM+dispCM)
@@ -118,7 +132,7 @@ PVpointR = 0
 PVpointC = 0
 while iDT < len(timeDT)-1:
     # if cathode is down go to next datapoint
-    if CathodeDown(timeDT[iDT]):
+    if cathodeDown(timeDT[iDT]):
         print "CathodeDown!"
         iDT += 1
         continue

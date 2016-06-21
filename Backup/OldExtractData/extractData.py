@@ -6,36 +6,46 @@ import array
 import ROOT
 
 def cathodeDown(time):
-  if (time > 1444400000) and (time < 1444530000):
-    return True
-  if (time > 1450008420) and (time < 1450040000):
-    return True
-  if (time > 1447840000) and (time < 1447875000):
-    return True
-  if (time > 1448640000) and (time < 1448670000):
-    return True
-  if (time > 1449600000) and (time < 1449800000):
-    return True
-  if (time > 1450010000) and (time < 1450040000):
-    return True
-  if (time > 1451448000) and (time < 1451468000):
-    return True
+    if (time > 1444400000) and (time < 1444530000):
+        return True
+    if (time > 1450008420) and (time < 1450040000):
+        return True
+    if (time > 1447840000) and (time < 1447875000):
+        return True
+    if (time > 1448640000) and (time < 1448670000):
+        return True
+    if (time > 1449600000) and (time < 1449800000):
+        return True
+    if (time > 1450010000) and (time < 1450040000):
+        return True
+    if (time > 1451448000) and (time < 1451468000):
+        return True
 
-  if (time > 1451447093) and (time < 1451467687):
-    return True
-  if (time > 1454421186) and (time < 1454447472):
-    return True
-  if (time > 1454502120) and (time < 1454618935):
-    return True
-  if (time > 1456930245) and (time < 1456930245):
-    return True
-  if (time > 1457188710) and (time < 1457202990):
-    return True
-  if (time > 1459947539) and (time < 1459981289):
-    return True
-  if (time > 1460041170) and (time < 1460057720):
-    return True
-  return False
+    if (time > 1451447093) and (time < 1451467687):
+        return True
+    if (time > 1454421186) and (time < 1454447472):
+        return True
+    if (time > 1454502120) and (time < 1454618935):
+        return True
+    if (time > 1456930245) and (time < 1456930245):
+        return True
+    if (time > 1457188710) and (time < 1457202990):
+        return True
+    if (time > 1459947539) and (time < 1459981289):
+        return True
+    if (time > 1460041170) and (time < 1460057720):
+        return True
+
+    if timestamp > 1450006200 and timestamp < 1450041600:
+        return True
+    if timestamp > 1454418000 and timestamp < 1454551200:
+        return True
+    if timestamp > 1456927200 and timestamp < 1456981200:
+        return True
+    if timestamp > 1459976400 and timestamp < 1460088000:
+        return True
+
+    return False
 
 timeArray = array.array("i",[0])
 voltArray = array.array("d",[0])
@@ -81,7 +91,7 @@ for x in POP_result:
   if x[0].day != day:
     day = x[0].day
     print x[0]
-  
+
   if x[1]:
     f_POP.write(str(time)+" "+str(x[1])+"\n")
     timeArray[0]=time
@@ -115,4 +125,3 @@ for x in AnC_result:
     f_AnC.write(str(time)+" "+str(x[1])+"\n")
 #    if abs(x[1]) > 0.01:
 #      f2_AnC.write(str(time)+" "+str(x[1])+"\n")
-
