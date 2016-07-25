@@ -1,0 +1,1352 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+
+\end_preamble
+\use_default_options true
+\begin_modules
+logicalmkup
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter courier
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 2
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2.5cm
+\topmargin 2.5cm
+\rightmargin 2.5cm
+\bottommargin 2.5cm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Finding Correlations in MicroBooNE 
+\begin_inset Quotes eld
+\end_inset
+
+Slow Monitor
+\begin_inset Quotes erd
+\end_inset
+
+ History Data
+\end_layout
+
+\begin_layout Abstract
+This short note describes some technical and mathematical issues in searching
+ for meaningful correlations in time among the histories of the over 4000
+ variables in the MicroBooNE monitoring system.
+ Python code is provided, its usage explained, and some example results
+ discussed.
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\arctanh}{\operatorname{arctanh}}
+{\text{arctanh }}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Summary of the problem
+\end_layout
+
+\begin_layout Standard
+We have a recorded history of the readings on each variable in the MicroBooNE
+ slow control and monitoring system.
+ We'd like to see if there are correlations between certain selected variables
+ and other variables, perhaps as part of a search for possible causes of
+ a particular instability or type of event.
+ This should come with an estimate of the statistical significance of a
+ given correlation.
+\end_layout
+
+\begin_layout Section
+Quick, the code! Give me the code!
+\end_layout
+
+\begin_layout Paragraph
+Where to find the code:
+\end_layout
+
+\begin_layout Standard
+The Python code is 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+correlator.py
+\end_layout
+
+\end_inset
+
+ in the 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+correlator
+\end_layout
+
+\end_inset
+
+ subdirectory of the Fermilab 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+uboone-slowmon-analysis
+\end_layout
+
+\end_inset
+
+ Redmine project.
+ Obtain either by direct download from the web page 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://cdcvs.fnal.gov/redmine/projects/uboone-slowmon-analysis/repository
+\end_layout
+
+\end_inset
+
+, or by cloning the repository:
+\end_layout
+
+\begin_layout Verbatim
+git clone ssh://p-uboone-slowmon-analysis@cdcvs.fnal.gov/cvs/projects/uboone-slowm
+on-analysis
+\end_layout
+
+\begin_layout Paragraph
+How to run the code:
+\end_layout
+
+\begin_layout Standard
+Here is a typical usage:
+\end_layout
+
+\begin_layout Verbatim
+import correlator    
+\end_layout
+
+\begin_layout Verbatim
+c = correlator.Correlator()
+\end_layout
+
+\begin_layout Verbatim
+corr_data = c.correlate1('uB_TPCDrift_HV01_keithleyPickOff/voltDiff5s60s',
+\end_layout
+
+\begin_layout Verbatim
+                         60, '2016-02-13 00:00:00', '2016-02-14 00:00:00')
+\end_layout
+
+\begin_layout Standard
+All of the methods of the 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+Correlator
+\end_layout
+
+\end_inset
+
+ class are documented with Python docstrings per the usual Pythonic convention.
+ The documentation as it currently stands is also provided as an appendix
+ to this note.
+\end_layout
+
+\begin_layout Standard
+The arguments to the 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+correlate1
+\end_layout
+
+\end_inset
+
+ function specify the primary variable that you want to correlate with all
+ other variables, the width of time bins in seconds, and the start and stop
+ times.
+ The data returned is list of 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+(zscore, corr, n, id, name)
+\end_layout
+
+\end_inset
+
+ tuples, where 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+zscore
+\end_layout
+
+\end_inset
+
+ is the estimated number of standard deviations of significance of the correlati
+on (with sign), 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+corr
+\end_layout
+
+\end_inset
+
+ is the correlation coefficient, 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ is the number of same-time-bin samples found, 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+name
+\end_layout
+
+\end_inset
+
+ is the channel with which the correlation was found, and 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+id
+\end_layout
+
+\end_inset
+
+ is the integer identifier used internally by the archiver for the channel.
+\end_layout
+
+\begin_layout Standard
+The data is initially sorted in order of channel id, but the list can easily
+ be resorted in order of increasing 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+zscore
+\end_layout
+
+\end_inset
+
+ by using Python's sort function.
+\end_layout
+
+\begin_layout Standard
+For plotting the data, I suggest using the PyROOT interface.
+ For example, the following will plot the histogram of 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+zscore
+\end_layout
+
+\end_inset
+
+ for all correlation results where 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+n
+\end_layout
+
+\end_inset
+
+ is greater than 3.
+\end_layout
+
+\begin_layout Verbatim
+import ROOT
+\end_layout
+
+\begin_layout Verbatim
+h1a = ROOT.TH1F("h1a","z-score distribution",128,-6.4,6.4)
+\end_layout
+
+\begin_layout Verbatim
+for z in (c[0] for c in corr_data if c[2]>3): 
+\end_layout
+
+\begin_layout Verbatim
+    h1a.Fill(z)
+\end_layout
+
+\begin_layout Verbatim
+h1a.Draw()
+\end_layout
+
+\begin_layout Verbatim
+
+\end_layout
+
+\begin_layout Paragraph
+How to understand the code and its results:
+\end_layout
+
+\begin_layout Standard
+Please read on.
+\end_layout
+
+\begin_layout Section
+Theory of operation
+\end_layout
+
+\begin_layout Paragraph
+Mathematical and technical issues:
+\end_layout
+
+\begin_layout Standard
+There is a complication introduced in making correlations by the fact that
+ the data is asynchronously sampled and recorded.
+ There is also a technical issue in efficiently retrieving data.
+ With those addressed, the correlation is fairly straightforward.
+\end_layout
+
+\begin_layout Paragraph
+Asynchronously sampled data:
+\end_layout
+
+\begin_layout Standard
+Our EPICS control system samples variables at intervals as short as 0.1
+\begin_inset space ~
+\end_inset
+
+second and as long as an hour; most variables are sampled at times from
+ a second or two up to a minute.
+ The periodically sampled data is not synchronized between variables.
+ Some data is pushed in from other systems at irregular intervals.
+ Furthermore, a new sample of a variable is only written to the database
+ if it differs from the previous one by an amount exceeding 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+ADEL
+\end_layout
+
+\end_inset
+
+, which is a parameter is set individually for each variable.
+ The 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+ADEL
+\end_layout
+
+\end_inset
+
+ parameter is necessary to avoid filling up the database with meaningless
+ samples, but the effect is to increase the asynchronicity of the data.
+\end_layout
+
+\begin_layout Standard
+Many ways of dealing with correlations of asynchronously sampled data can
+ be found in the literature.
+ One of the simplest is to bin the samples in regular bins in time.
+ This is the approach used in the example correlator code.
+\end_layout
+
+\begin_layout Standard
+A related question is how to handle cases where two variables do not both
+ have samples in a given time bin.
+ One possibility is to use interpolation or simply the previously recorded
+ value of each variable.
+ Assuming the archiver is working continuously throughout the time interval
+ of interest, the absence of a sample for a variable implies that the variable
+ did not change more than its 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+ADEL
+\end_layout
+
+\end_inset
+
+ since the previous sample.
+ There are a number of problems with this assumption, however: a power outage
+ or other problem might cause the archiver to stop working without recording
+ its shut-down time; 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+ADEL
+\end_layout
+
+\end_inset
+
+ values for some channels have been tuned over time, and the archiver does
+ not record the history of these changes; and we do not know how the value
+ of the variable varies within 
+\begin_inset Formula $\pm$
+\end_inset
+
+
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+ADEL
+\end_layout
+
+\end_inset
+
+ between samples, so it is not clear whether or how to interpolate between
+ two samples.
+ 
+\end_layout
+
+\begin_layout Standard
+An alternative to interpolating data between samples is to calculate the
+ correlation of two variables using only time bins where both variables
+ had samples.
+ This has the effect of increasing the weight of times where the two variables
+ changed at the same time to within the bin size, which is not undesirable
+ for the intended application.
+ This is what is done in the example code.
+\end_layout
+
+\begin_layout Paragraph
+Database retrieval efficiency:
+\end_layout
+
+\begin_layout Standard
+The data is stored in a postgresql database.
+ Because of the structure of the database, it is easy to write SQL queries
+ that take an inordinate amount of time and server resources to retrieve,
+ but with care the queries can be made very efficient.
+ It is worth taking a moment to understand why.
+\end_layout
+
+\begin_layout Standard
+Two tables are important for our purposes: 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+channel
+\end_layout
+
+\end_inset
+
+ gives the mapping of channel (variable) names to 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+channel_id
+\end_layout
+
+\end_inset
+
+ integers, and 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+sample
+\end_layout
+
+\end_inset
+
+ contains all samples recorded for any channel in a single table of many
+ rows.
+ The 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+sample
+\end_layout
+
+\end_inset
+
+ table contains fields 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+channel_id
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+smpl_time
+\end_layout
+
+\end_inset
+
+, 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+nanosecs
+\end_layout
+
+\end_inset
+
+, and 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+float_val
+\end_layout
+
+\end_inset
+
+ (among others), giving the channel identifier, the time the sample was
+ taken, and its value, respectively.
+ The table is indexed by the key 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+(channel_id, smpl_time, nanosecs)
+\end_layout
+
+\end_inset
+
+.
+ The result of this indexing is that it is very efficient to retrieve data
+ for a specified channel over a range of times in a single request, but
+ very inefficient to retrieve all channels over a specified time range.
+ It turns out to be orders of magnitude faster to issue a separate SQL 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+select
+\end_layout
+
+\end_inset
+
+ request for each channel than to retrieve all channels over the desired
+ time in a single request.
+ The SQL 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+group by
+\end_layout
+
+\end_inset
+
+ clause can be used to bin the data efficiently at the server before transfer
+ to the client, which can also improve performance.
+ This approach is used in the 
+\begin_inset Flex Code
+status open
+
+\begin_layout Plain Layout
+correlator
+\end_layout
+
+\end_inset
+
+ Python class.
+\end_layout
+
+\begin_layout Paragraph
+Definition of the correlation coefficient:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+r_{xy}=\frac{\sum_{i=1}^{n}(x_{i}-\bar{x})(y_{i}-\bar{y})}{\sqrt{\sum_{i=1}^{n}(x_{i}-\bar{x})^{2}}\sqrt{\sum_{i=1}^{n}(y_{i}-\bar{y})^{2}}}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $n$
+\end_inset
+
+ is the number of samples, 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ are the sample values, 
+\begin_inset Formula $\bar{x}=\frac{1}{n}\sum_{i=1}^{n}x_{i}$
+\end_inset
+
+ is the mean of 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+, and similarly for 
+\begin_inset Formula $y_{i}$
+\end_inset
+
+ and 
+\begin_inset Formula $\bar{y}$
+\end_inset
+
+.
+ For reasons explained above, 
+\begin_inset Formula $n$
+\end_inset
+
+ is the number of time bins in which both 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+ have samples, and can therefore be different for each pair of variables.
+ Since this is a number derived from data with random statistical fluctuations,
+ 
+\begin_inset Formula $r_{xy}$
+\end_inset
+
+ will itself have random statistical fluctuations.
+\end_layout
+
+\begin_layout Standard
+A special case occurs if either variable has no variance in the sample,
+ which is guaranteed if 
+\begin_inset Formula $n=1$
+\end_inset
+
+ but could conceivably happen for any 
+\begin_inset Formula $n$
+\end_inset
+
+: in such a case 
+\begin_inset Formula $r_{xy}$
+\end_inset
+
+ is undefined 
+\begin_inset Formula $(0/0)$
+\end_inset
+
+.
+ Another special case occurs when 
+\begin_inset Formula $n=2$
+\end_inset
+
+ and both variables have variance, in which case 
+\begin_inset Formula $r_{xy}$
+\end_inset
+
+ is guaranteed to be exactly 
+\begin_inset Formula $+1$
+\end_inset
+
+ or 
+\begin_inset Formula $-1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Significance score:
+\end_layout
+
+\begin_layout Standard
+The Fisher transformation
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-2"
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+F(r)=\arctanh r
+\]
+
+\end_inset
+
+produces a random variable 
+\begin_inset Formula $F(r)$
+\end_inset
+
+ with an approximately gaussian distribution, with standard deviation 
+\begin_inset Formula $1/\sqrt{n-3}$
+\end_inset
+
+ and mean 
+\begin_inset Formula $F(\rho)$
+\end_inset
+
+, where 
+\begin_inset Formula $\rho$
+\end_inset
+
+ is the true correlation of the underlying joint probability distribution
+ of the two variables.
+ The statistical significance of a correlation expressed as the number of
+ standard deviations from zero (also known as standard score or z-score
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-3"
+
+\end_inset
+
+) can be estimated as
+\begin_inset Formula 
+\[
+z=F(r)\sqrt{n-3}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Examples
+\end_layout
+
+\begin_layout Paragraph
+An example using 1 hour of data in 1-minute bins:
+\end_layout
+
+\begin_layout Standard
+Here is the distribution of z-score for correlations of the 
+\begin_inset Quotes eld
+\end_inset
+
+blip detector
+\begin_inset Quotes erd
+\end_inset
+
+ variable 
+\family typewriter
+'uB_TPCDrift_HV01_keithleyPickOff/voltDiff5s60s'
+\family default
+ with every other variable over a 1-hour period, using data binned in 60-second
+ intervals:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename zscore-dist-1hr-blip.png
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Only correlations with 
+\begin_inset Formula $n>3$
+\end_inset
+
+ are histogrammed.
+ The distribution looks approximately gaussian, and in fact has a mean of
+ zero and an RMS of 1.
+ But what is that big spike at -1.7? There are almost 40 variables with the
+ same z-score.
+\end_layout
+
+\begin_layout Standard
+Upon investigation, it turns out that all of those variables increased continuou
+sly with time over the hour in question.
+ (Most of them were timestamps used for 
+\begin_inset Quotes eld
+\end_inset
+
+age
+\begin_inset Quotes erd
+\end_inset
+
+ calculations.) The value of the 
+\begin_inset Quotes eld
+\end_inset
+
+blip detector
+\begin_inset Quotes erd
+\end_inset
+
+ happened to trend down over the course of this hour, resulting in this
+ correlation.
+\end_layout
+
+\begin_layout Standard
+This is not a 
+\begin_inset Quotes eld
+\end_inset
+
+false correlation
+\begin_inset Quotes erd
+\end_inset
+
+ because there is in fact a mathematical correlation.
+ If this is not the kind of correlation you are looking for, there are some
+ obvious steps to take, the easiest of which is to look at data over a longer
+ time range.
+\end_layout
+
+\begin_layout Paragraph
+An example using 24 hours of data in 1-minute bins:
+\end_layout
+
+\begin_layout Standard
+Here is the distribution of z-score for correlations of the same 
+\begin_inset Quotes eld
+\end_inset
+
+blip detector
+\begin_inset Quotes erd
+\end_inset
+
+ variable with all other variables over a 24-hour period, which includes
+ the 1-hour period above, still using data binned in 60-second intervals:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename zscore-dist-24hr-blip.png
+	width 90text%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The spike at 
+\begin_inset Formula $z=-1.7$
+\end_inset
+
+ has disappeared.
+ The fit function shown in red is a gaussian; a logarithmic scale is used
+ on the y axis was to bring out the behavior at large 
+\begin_inset Formula $z$
+\end_inset
+
+ score.
+ Overall the distribution is very well approximated by a gaussian, except
+ for an excess at very small values of 
+\begin_inset Formula $z$
+\end_inset
+
+ score, and possibly a tail at 
+\begin_inset Formula $|z|>3$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+In my initial look, none of the variables at large 
+\begin_inset Formula $z$
+\end_inset
+
+ had an obvious causal relationship with anything related to what the 
+\begin_inset Quotes eld
+\end_inset
+
+blip detector
+\begin_inset Quotes erd
+\end_inset
+
+ is supposed to detect.
+ With over 4000 variables, there are bound to be some out in the tails of
+ the distribution just from statistics.
+ However, this does not mean you will not find something interesting with
+ more data or a different time range.
+ 
+\end_layout
+
+\begin_layout Section
+Closing thoughts
+\end_layout
+
+\begin_layout Paragraph
+Some comments on choice of time bins and time range:
+\end_layout
+
+\begin_layout Standard
+As seen above, picking a longer time range is a good way to reduce correlations
+ due to linear trends over a shorter time.
+ Picking a larger time bin could be a good way to reduce noise and increase
+ sensitivity to longer-term correlations while reducing sensitivity to short
+ fluctuations.
+ Picking a smaller time bin could increase sensitivity to fast fluctuations,
+ but there is the risk of reducing the number of common time-bin samples
+ with other variables, particularly if the bin size is smaller than the
+ sampling period for both of the variables.
+\end_layout
+
+\begin_layout Paragraph
+Some ideas for improvements:
+\end_layout
+
+\begin_layout Itemize
+For cases where correlations of fast fluctuations are of primary interest,
+ a running average or exponentially-time-weighted average of previous samples
+ could be subtracted from the data to implement a high-pass filter.
+ 
+\end_layout
+
+\begin_layout Itemize
+For cases where slow fluctuations are of interest, the opposite could be
+ done.
+\end_layout
+
+\begin_layout Itemize
+Linear trends could be subtracted to eliminate the effect seen in the 1-hour
+ example above, particularly when it is known an interesting behavior (e.g.,
+ a 
+\begin_inset Quotes eld
+\end_inset
+
+blip
+\begin_inset Quotes erd
+\end_inset
+
+) only happened in a particular time range.
+ 
+\end_layout
+
+\begin_layout Itemize
+The correlator currently only looks for correlations in simultaneous samples,
+ not correlations with samples earlier or later in time.
+ A more general cross-correlator could calculate the correlation function.
+\end_layout
+
+\begin_layout Standard
+None of the enhancements above would be appropriate for every use case,
+ but would be appropriate for some, so there should be some way for the
+ user to select which options are desired.
+\end_layout
+
+\begin_layout Section
+\start_of_appendix
+Documentation of correlator module
+\end_layout
+
+\begin_layout Verbatim
+NAME
+\end_layout
+
+\begin_layout Verbatim
+    correlator
+\end_layout
+
+\begin_layout Verbatim
+
+\end_layout
+
+\begin_layout Verbatim
+DESCRIPTION
+\end_layout
+
+\begin_layout Verbatim
+    correlator.py -- implements a correlation-finder for the ControlSystemStudio
+\end_layout
+
+\begin_layout Verbatim
+    rdb archive engine.
+\end_layout
+
+\begin_layout Verbatim
+    
+\end_layout
+
+\begin_layout Verbatim
+CLASSES
+\end_layout
+
+\begin_layout Verbatim
+    Correlator
+\end_layout
+
+\begin_layout Verbatim
+    
+\end_layout
+
+\begin_layout Verbatim
+    class Correlator
+\end_layout
+
+\begin_layout Verbatim
+     |  Class encapsulating various functions for retrieving data and
+\end_layout
+
+\begin_layout Verbatim
+     |  calculating correlations.
+\end_layout
+
+\begin_layout Verbatim
+     |  
+\end_layout
+
+\begin_layout Verbatim
+     |  Methods defined here:
+\end_layout
+
+\begin_layout Verbatim
+     |  
+\end_layout
+
+\begin_layout Verbatim
+     |  __init__(self)
+\end_layout
+
+\begin_layout Verbatim
+     |      Initialize the correlator -- opens the database on ifdbrep2.
+\end_layout
+
+\begin_layout Verbatim
+     |      [Currently the host is hard-coded, which should be fixed.]
+\end_layout
+
+\begin_layout Verbatim
+     |      The smcreader password should be set in the file ~/.pgpass,
+\end_layout
+
+\begin_layout Verbatim
+     |      which should have mode 0600.
+\end_layout
+
+\begin_layout Verbatim
+     |  
+\end_layout
+
+\begin_layout Verbatim
+     |  correlate1(self, channel, dt_s, tstart, tstop)
+\end_layout
+
+\begin_layout Verbatim
+     |      Get the correlation coefficients of a given channel with
+\end_layout
+
+\begin_layout Verbatim
+     |      all channels.
+  channel may be an integer or a string.
+  dt_s
+\end_layout
+
+\begin_layout Verbatim
+     |      is in seconds.
+  tstart and tstop should be time strings in a
+\end_layout
+
+\begin_layout Verbatim
+     |      format that postgresql understands (ideally ISO8601 / SQL
+\end_layout
+
+\begin_layout Verbatim
+     |      standard), or a datetime object.
+\end_layout
+
+\begin_layout Verbatim
+     |      The correlation coefficient calculated is sample-weighted
+\end_layout
+
+\begin_layout Verbatim
+     |      rather than time-weighted.
+ Only time bins where both variables
+\end_layout
+
+\begin_layout Verbatim
+     |      have a sample in the same time bin are used.
+\end_layout
+
+\begin_layout Verbatim
+     |      The data returned is list of (zscore, corr, n, id, name) tuples,
+\end_layout
+
+\begin_layout Verbatim
+     |      where corr is the correlation coefficient,
+\end_layout
+
+\begin_layout Verbatim
+     |      n is the number of same-time-bin samples found,
+\end_layout
+
+\begin_layout Verbatim
+     |      id is the channel id, name is the channel name,
+\end_layout
+
+\begin_layout Verbatim
+     |      zscore is the number of standard deviations of significance.
+\end_layout
+
+\begin_layout Verbatim
+     |  
+\end_layout
+
+\begin_layout Verbatim
+     |  query_timebinned_data(self, channel_id, dt_s, tstart, tstop)
+\end_layout
+
+\begin_layout Verbatim
+     |      Get data for channel channel_id binned in steps of
+\end_layout
+
+\begin_layout Verbatim
+     |      dt_s.
+ The channel_id must be an integer.
+  dt_s is in seconds.
+\end_layout
+
+\begin_layout Verbatim
+     |      tstart and tstop should be time strings in a format that
+\end_layout
+
+\begin_layout Verbatim
+     |      postgresql understands (ideally ISO8601 / SQL standard), or
+\end_layout
+
+\begin_layout Verbatim
+     |      a datetime object.
+\end_layout
+
+\begin_layout Verbatim
+     |      The data is not fetched.
+  Use the cursor object to retrieve.
+\end_layout
+
+\begin_layout Verbatim
+     |      The columns are (channel_id, tbin, avg).
+\end_layout
+
+\begin_layout Verbatim
+
+\end_layout
+
+\begin_layout Verbatim
+FUNCTIONS
+\end_layout
+
+\begin_layout Verbatim
+    cor_xy(xdat, ydat)
+\end_layout
+
+\begin_layout Verbatim
+        Given two sparse lists [(id,xdat),...] and [(id,ydat),...],
+\end_layout
+
+\begin_layout Verbatim
+        sorted in order of increasing id, find the correlation coefficient
+\end_layout
+
+\begin_layout Verbatim
+          corr = <dx dy> / (stddev(dx)*stddev(dy))
+\end_layout
+
+\begin_layout Verbatim
+        using only entries with common ids.
+\end_layout
+
+\begin_layout Verbatim
+        Returns (corr, n), where corr is as defined above and n is the number
+ of
+\end_layout
+
+\begin_layout Verbatim
+        samples.
+  Returns corr=0 if n <= 1.
+  Meaningless for n <= 2.
+\end_layout
+
+\begin_layout Verbatim
+    
+\end_layout
+
+\begin_layout Verbatim
+    test_1()
+\end_layout
+
+\begin_layout Verbatim
+        A test function for the data retrieval.
+\end_layout
+
+\begin_layout Verbatim
+        Retrieves all data in a 1-hour period for channels 1 through 4483,
+ 
+\end_layout
+
+\begin_layout Verbatim
+        one channel at a time.
+\end_layout
+
+\begin_layout Verbatim
+    
+\end_layout
+
+\begin_layout Verbatim
+    test_2()
+\end_layout
+
+\begin_layout Verbatim
+        A test function for the 1-to-all correlation function correlate1().
+\end_layout
+
+\begin_layout Verbatim
+        Retrieves all data for a 1-day period and finds correlation coefficients
+\end_layout
+
+\begin_layout Verbatim
+        for correlations of any variable with 
+\end_layout
+
+\begin_layout Verbatim
+        uB_TPCDrift_HV01_keithleyPickOff/voltDiff5s60s
+\end_layout
+
+\begin_layout Verbatim
+        and the corresponding z-score significances of the correlations.
+\end_layout
+
+\begin_layout Verbatim
+
+\end_layout
+
+\begin_layout Verbatim
+
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "1"
+key "key-2"
+
+\end_inset
+
+
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://en.wikipedia.org/wiki/Pearson_product-moment_correlation_coefficient#Using
+_the_Fisher_transformation
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "2"
+key "key-3"
+
+\end_inset
+
+
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://en.wikipedia.org/wiki/Standard_score
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
